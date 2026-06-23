@@ -1,0 +1,27 @@
+{
+  "name": "vividgl",
+  "version": "0.1.0",
+  "description": "Zero-dependency WebGL animated backgrounds for any framework",
+  "type": "module",
+  "main": "./dist/vividgl.cjs",
+  "module": "./dist/vividgl.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/vividgl.js",
+      "require": "./dist/vividgl.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "vite build && tsc --emitDeclarationOnly --declaration --outDir dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "~5.0.0",
+    "vite": "^5.0.0",
+    "vite-plugin-glsl": "^1.6.0"
+  }
+}
