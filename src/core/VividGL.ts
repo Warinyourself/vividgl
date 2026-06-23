@@ -1,6 +1,6 @@
 import { GL } from './GL'
 import { register, get, list } from './registry'
-import type { ThemeDef, ParamValues } from './types'
+import type { ThemeDef, ParamValues, ParamDef } from './types'
 
 type EventMap = {
   frame: (time: number) => void
@@ -23,19 +23,31 @@ export class VividGL {
   // ─── Instance ─────────────────────────────────────────────────────────────
 
   private _gl: GL
+  private _canvas: HTMLCanvasElement
+  private _def: ThemeDef
   private _params: ParamValues = {}
+  private _timeScale = 1 / 500
   private _uniformSetters: Map<string, (value: number | string | boolean) => void> = new Map()
   private _events: Partial<{ [K in keyof EventMap]: EventMap[K][] }> = {}
 
   constructor(canvas: HTMLCanvasElement, theme: string, params: ParamValues = {}) {
     const def = get(theme)
+    this._def = def
+    this._canvas = canvas
     this._params = { ...params }
+
+    // Set initial time scale from default speed param if defined
+    const speedDef = Object.entries(def.params ?? {}).find(([, d]) => d.type === 'speed')
+    if (speedDef) {
+      const initSpeed = (params[speedDef[0]] ?? speedDef[1].default) as number
+      this._timeScale = initSpeed / 500
+    }
 
     this._gl = new GL(canvas, def.vertex, def.fragment, {
       extensions: def.extensions,
       externalTime: true,
       onFrame: (gl) => {
-        gl.time += 0.016  // default ~60fps fallback; themes can override via setParam('speed', ...)
+        gl.time += this._timeScale
         gl.ctx.uniform1f(gl.programInfo.uniforms.time!, gl.time)
         this._emit('frame', gl.time)
       }
@@ -51,23 +63,40 @@ export class VividGL {
     const ctx = gl.ctx
 
     for (const [name, schema] of Object.entries(def.params ?? {})) {
+      // 'speed' is handled via _timeScale, not as a GLSL uniform
+      if (schema.type === 'speed') {
+        this._uniformSetters.set(name, (value) => {
+          this._timeScale = (value as number) / 500
+        })
+        continue
+      }
+
       const loc = ctx.getUniformLocation(gl.program!, this._uniformName(name))
-      if (!loc) continue
 
       const setter = (value: number | string | boolean) => {
         ctx.useProgram(gl.program)
         if (schema.type === 'color' && typeof value === 'string') {
           const [r, g, b] = hexToRgb(value)
-          ctx.uniform3f(loc, r / 255, g / 255, b / 255)
+          ctx.uniform3f(loc!, r / 255, g / 255, b / 255)
         } else if (schema.type === 'bool') {
-          ctx.uniform1i(loc, value ? 1 : 0)
-        } else {
+          ctx.uniform1i(loc!, value ? 1 : 0)
+        } else if (loc) {
           ctx.uniform1f(loc, value as number)
+        }
+        // Re-apply CSS style effect when any param changes
+        if (def.styleEffect) {
+          const style = def.styleEffect({ ...this._params, [name]: value })
+          Object.assign(this._canvas.style, style)
         }
       }
 
       this._uniformSetters.set(name, setter)
       setter(initial[name] ?? schema.default)
+    }
+
+    // Apply initial styleEffect
+    if (def.styleEffect) {
+      Object.assign(this._canvas.style, def.styleEffect(this._params))
     }
   }
 
