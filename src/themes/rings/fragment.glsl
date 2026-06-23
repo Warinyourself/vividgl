@@ -21,21 +21,21 @@ void main() {
   uv *= mat2(cos(angle), sin(angle), sin(angle), cos(angle));
 
   float fineness = mx * 0.4; // 0 + 0.4
-  // float fineness = mx * (abs(hue) + 0.2); // 0 + 0.4
+  // float fineness = mx * (abs(uHue) + 0.2); // 0 + 0.4
   float sy = uv.y * fineness;
   float c = fract(-sin(floor(sy) / fineness * 14.) * 437.);
 
   float f = fract(sy);
   c *= min(f, 1. - f) * 3.;
 
-  // float zoom = 32.415;
+  // float uZoom = 32.415;
   float intensity = 2.5;
   // highlights
-  c += cos(uv.y * zoom - uTime) * intensity;
+  c += cos(uv.y * uZoom - uTime) * intensity;
 
   // background
-  float r = -uv.y + (.5 + hue);
-  float b = uv.y + (.5 - hue);
+  float r = -uv.y + (.5 + uHue);
+  float b = uv.y + (.5 - uHue);
 
   fragColor = vec4(mix(vec3(r, r*.3, b), vec3(c), .3), 1.0);
 }

@@ -53,6 +53,9 @@ export class VividGL {
       }
     })
 
+    // Clear any lingering CSS from a previous theme if this one doesn't use styleEffect
+    if (!def.styleEffect) canvas.style.filter = ''
+
     this._buildSetters(def, params)
   }
 
@@ -139,8 +142,13 @@ export class VividGL {
   set pixelSize(v: number) { this._gl.pixelSize = v }
   get pixelSize(): number  { return this._gl.pixelSize }
 
+  set pxratio(v: number) { this._gl.pxratio = v }
+  get pxratio(): number  { return this._gl.pxratio }
+
   destroy(): void {
     this._gl.destroy()
+    // Reset any CSS style effects applied to the canvas
+    this._canvas.style.filter = ''
     this._emit('destroy')
     this._events = {}
   }

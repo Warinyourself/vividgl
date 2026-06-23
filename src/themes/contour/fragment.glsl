@@ -10,10 +10,10 @@ uniform vec2 uResolution;
 uniform float uScale;
 
 // Number of stripes/contour lines across the noise field
-uniform float uScaleContour;
+uniform float uContour;
 
 // Line width: controls how much of the contour field is visible (0 = thin hairlines, 1 = wide bands)
-uniform float uWidth;
+
 
 
 // Max line band: caps the upper visible threshold so all lines have similar spatial width
@@ -21,13 +21,13 @@ uniform float uWidth;
 uniform float uMaxLine;
 
 // First gradient color (RGB)
-uniform vec3 uColor1;
+uniform vec3 uColorActive;
 
 // Second gradient color (RGB)
-uniform vec3 uColor2;
+uniform vec3 uColorSecond;
 
 // Background color — shown where lines and glow are absent
-uniform vec3 uBackground;
+uniform vec3 uColorBg;
 
 const float M_PI = 3.14159265;
 const int NUM_OCTAVES = 2;
@@ -89,7 +89,7 @@ float noise(vec2 uv, float r) {
 
 // Maps noise value to a periodic wave that creates the contour bands
 float wave(float t) {
-  return 0.5 * (1.0 - cos(uScaleContour * M_PI * t));
+  return 0.5 * (1.0 - cos(uContour * M_PI * t));
 }
 
 out vec4 fragColor;
@@ -101,9 +101,9 @@ void main() {
 
   float noise_fac = noise(uv, r);
   float contour_fac = wave(noise_fac);
-  vec3 color = mix(uColor1, uColor2, noise_fac);
+  vec3 color = mix(uColorActive, uColorSecond, noise_fac);
 
-  float lo = 1.0 - uWidth;
+  float lo = 0.3; // 1.0 - 0.7 (hardcoded width)
   float hi = lo + uMaxLine;
   float fw = fwidth(contour_fac);
 
@@ -113,5 +113,5 @@ void main() {
              - smoothstep(hi - fw, hi + fw, contour_fac);
 
   float brightness = line;
-  fragColor = vec4(mix(uBackground, color, brightness), 1.0);
+  fragColor = vec4(mix(uColorBg, color, brightness), 1.0);
 }

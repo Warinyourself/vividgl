@@ -9,7 +9,7 @@ precision highp float;
 
 uniform float uTime;
 uniform vec2 uResolution;
-uniform float size;
+uniform float uSize;
 
 #define R(p, a) p = p * cos(a) + vec2(-p.y, p.x) * sin(a)
 
@@ -34,7 +34,7 @@ vec3 GetColor(vec3 p) {
 
 void mainImage(out vec4 col, in vec2 fragCoord) {
 	vec3 rd = normalize(vec3(2.0 * fragCoord.xy - uResolution.xy, -uResolution.y));
-  vec3 ro = vec3(0.0, 0.0, size);
+  vec3 ro = vec3(0.0, 0.0, uSize);
 
   R(rd.xz, 0.5 * uTime);
   R(ro.xz, 0.5 * uTime);
