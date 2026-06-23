@@ -1,8 +1,15 @@
 {
   "name": "vividgl",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Zero-dependency WebGL animated backgrounds for any framework",
-  "keywords": ["webgl", "background", "animation", "shader", "canvas", "glsl"],
+  "keywords": [
+    "webgl",
+    "background",
+    "animation",
+    "shader",
+    "canvas",
+    "glsl"
+  ],
   "license": "MIT",
   "author": "Warinyourself",
   "type": "module",
@@ -16,7 +23,10 @@
       "types": "./dist/index.d.ts"
     }
   },
-  "files": ["dist", "README.md"],
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "dev": "vite build --watch",
     "build": "vite build && tsc --emitDeclarationOnly --declaration --outDir dist",
