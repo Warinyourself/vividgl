@@ -46,6 +46,7 @@ export class VividGL {
     this._gl = new GL(canvas, def.vertex, def.fragment, {
       extensions: def.extensions,
       externalTime: true,
+      bloom: def.bloom,
       onFrame: (gl) => {
         gl.time += this._timeScale
         gl.ctx.uniform1f(gl.programInfo.uniforms.time!, gl.time)

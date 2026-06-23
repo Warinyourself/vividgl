@@ -5,6 +5,10 @@ import fragment from './fragment.glsl'
 export const contour: ThemeDef = {
   vertex, fragment,
   extensions: ['OES_standard_derivatives'],
+  bloom: {
+    passesA: 1, radiusA: 3,   intensityA: 0.7,
+    passesB: 1, radiusB: 0.5, intensityB: 1.0,
+  },
   params: {
     pxratio:     { type: 'float', default: 1,    min: 0.01, max: 1,    step: 0.01 },
     speed:       { type: 'speed', default: 3,    min: 0,    max: 15,   step: 0.1  },
